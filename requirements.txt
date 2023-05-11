@@ -1,0 +1,7 @@
+setuptools
+openai-whisper
+faster-whisper
+pyaudio
+pyannote.audio: 0.0.1
+torch: 1.10.0
+whisperx @ git+https://github.com/m-bain/whisperx
