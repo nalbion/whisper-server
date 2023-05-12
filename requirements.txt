@@ -1,7 +1,9 @@
 setuptools
 openai-whisper
 faster-whisper
+flask_sse
 pyaudio
 pyannote.audio: 0.0.1
+ssdpy
 torch: 1.10.0
 whisperx @ git+https://github.com/m-bain/whisperx
