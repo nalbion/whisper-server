@@ -6,16 +6,18 @@
 <body>
   <h1>Whisper Server</h1>
   <script>
-    var source = new EventSource("{{ url_for('sse.stream') }}");
-    source.addEventListener('whisper', function(event) {
-        var data = JSON.parse(event.data);
+    const source = new EventSource('/whisper');
+    source.addEventListener('message', function(event) {
+        const data = JSON.parse(event.data);
         console.info('Whisper recognised:', data);
-        document.getElementById('whisper').innerHTML += data;
+        document.getElementById('whisper').innerHTML += `<div>${data.results[0].text}</div>`;
+        console.info(`appended <div>${data.results[0].text}</div>`);
+        console.info(document.getElementById('whisper').innerHTML);
     }, false);
     source.addEventListener('error', function(event) {
-        error = 'Failed to connect to event stream. Is Whisper running?';
+        const error = 'Failed to connect to event stream. Is Whisper running?';
         console.error(error);
-        document.getElementById('whisper').innerHTML = error;
+        // document.getElementById('whisper').innerHTML = `<div>${error}</div>`;
     }, false);
   </script>
 
