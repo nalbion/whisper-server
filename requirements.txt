@@ -1,9 +1,15 @@
-setuptools
-openai-whisper
+asyncio
+# sse
+aiohttp
+aiohttp_jinja2
+jinja2
+asyncio-sse
 faster-whisper
-flask_sse
+# flask_sse
+openai-whisper
 pyaudio
-pyannote.audio: 0.0.1
+pyannote.audio #==0.0.1
+setuptools
 ssdpy
-torch: 1.10.0
+torch  #==1.11.0
 whisperx @ git+https://github.com/m-bain/whisperx
