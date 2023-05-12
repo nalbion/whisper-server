@@ -10,6 +10,7 @@ RECORD_SECONDS = CHUNK_LENGTH  # 30
 # FRAMES_PER_BUFFER = 3000
 # OpenAI Whisper complains if not 480000: assert x.shape[1:] == self.positional_embedding.shape, "incorrect audio shape"
 FRAMES_PER_BUFFER = RECORD_SECONDS * SAMPLE_RATE  # 480,000 = N_SAMPLES
+FRAMES_TO_PROCESS = FRAMES_PER_BUFFER >> 3
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 
@@ -40,7 +41,7 @@ class Microphone:
             if self.stream.is_active():
                 start = time.time()
                 # print("listening...")  # {:.3f}".format(time.time() - start))
-                data = self.stream.read(FRAMES_PER_BUFFER >> 3)
+                data = self.stream.read(FRAMES_TO_PROCESS)
                 # print("got audio from the mic, {:.3f}".format(time.time() - start))
                 prev = time.time()
                 yield np.frombuffer(data, np.int16).flatten().astype(np.float32) / 32768.0

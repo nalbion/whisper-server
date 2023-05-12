@@ -1,5 +1,11 @@
 # Whisper Server
 
+## Running Whisper Server
+
+```bash
+python -m whisper_server
+```
+
 ## Whisper
 Follow the setup instructions at [Whisper on GitHub](https://github.com/openai/whisper):
 - install Python

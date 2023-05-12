@@ -34,34 +34,40 @@ default_asr_options = faster_whisper.transcribe.TranscriptionOptions(
 _stdout = sys.stdout
 _notout = open(os.devnull, 'w')
 
+
 class WhisperxService(AbstractWhisperService):
+    """
+    See https://github.com/m-bain/whisperX
+    """
+
     def __init__(
-            self, mic: Microphone, model: str = "base", english: bool = True
+            self, mic: Microphone, model: str = 'base', english: bool = True
     ):
         super().__init__(mic, model, english)
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         # options = faster_whisper.transcribe.TranscriptionOptions()
-        compute_type = "auto"  # "default"  # float16 for GPU. For CPU: int16, float32 or int8
+        compute_type = 'auto'  # 'default'  # float16 for GPU. For CPU: int16, float32 or int8
         self.model = whisperx.load_model(self.model_name, device, compute_type)
         self.vad_model = load_vad_model(torch.device(device))
-        language = "en" if english else None
-        print("Tokenizer:")
+        language = 'en' if english else None
+        print('Tokenizer:')
         print(str(self.model.tokenizer))
         # self.tokenizer = faster_whisper.tokenizer.Tokenizer(self.model.tokenizer, not english,
-        #                                                     task="transcribe", language=language)
+        #                                                     task='transcribe', language=language)
 
     def speech_to_text(self, audio: np.ndarray):
         # whisperx FasterWhisperPipeline.transcribe() runs the audio through a VAD, tokenizer
 
         # self.model.transcribe(audio)
-        # default_vad_options = { "vad_onset": 0.500, "vad_offset": 0.363 }
+        # default_vad_options = { 'vad_onset': 0.500, 'vad_offset': 0.363 }
 
-        vad_segments = self.vad_model({"waveform": torch.from_numpy(audio).unsqueeze(0), "sample_rate": SAMPLE_RATE})
+        vad_segments = self.vad_model({'waveform': torch.from_numpy(audio).unsqueeze(0), 'sample_rate': SAMPLE_RATE})
         sys.stdout = _notout
         vad_segments = merge_chunks(vad_segments, CHUNK_LENGTH)
         sys.stdout = _stdout
 
         features = log_mel_spectrogram(audio, padding=N_SAMPLES - audio.shape[0])
 
-        return self.model.model.generate_segment_batched(features, self.model.tokenizer, default_asr_options)[0].lstrip()
+        results = self.model.model.generate_segment_batched(features, self.model.tokenizer, default_asr_options)
+        return map(lambda hypothesis: {"text": hypothesis.lstrip()}, results)
