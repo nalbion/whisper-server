@@ -6,6 +6,8 @@ jinja2
 asyncio-sse
 faster-whisper
 # flask_sse
+grpcio
+grpcio-tools
 openai-whisper
 pyaudio
 pyannote.audio #==0.0.1

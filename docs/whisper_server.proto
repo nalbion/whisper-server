@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package org.openasr;
+
+//message WhisperHypothesis {
+//    string text = 1;
+//    float avg_logprob = 2;
+//}
+//
+//message WhisperDetailedOutput {
+//    repeated WhisperHypothesis alternatives = 1;
+//}
+
+message EmptyRequest {}
+message EmptyResponse {}
+
+enum ProcessingDevice {
+    cpu = 0;
+    gpu = 1;
+}
+
+message LoadModelRequest {
+    string name = 1;
+    optional string language = 2;
+    optional ProcessingDevice device = 3;
+    optional string download_root = 4;
+    optional bool in_memory = 5;
+}
+
+message WhisperSimpleOutput {
+    repeated string alternatives = 2;
+}
+
+message DecodingOptions {
+    optional string task = 1; // whether to perform X->X "transcribe" or X->English "translate". Default is "transcribe"
+    optional string language = 2; // language that the audio is in; uses detected language if None
+
+    optional float temperature = 3; // default 0.0
+    optional int32 sample_len = 4;  // maximum number of tokens to sample
+    optional int32 best_of = 5;     // number of independent sample trajectories, if t > 0
+    optional int32 beam_size = 6;   // number of beams in beam search, if t == 0
+    optional float patience = 7;    // patience in beam search (arxiv:2204.05424)
+
+    optional float length_penalty = 8; // "alpha" in Google NMT, or None for length norm, when ranking generations to select which to return among the beams or best-of-N samples
+
+    optional string prompt = 9;  // could also be List[int]   for the previous context
+    optional string prefix = 10; // could also be List[int]   to prefix the current context
+    optional string suppress_tokens = 11; // or List[int]  "-1" # list of tokens ids (or comma-separated token ids) to suppress "-1" will suppress a set of symbols as defined in `tokenizer.non_speech_tokens()`
+    optional bool suppress_blank = 12;    // Default: True. this will suppress blank outputs
+    optional bool without_timestamps = 13; // Default: False  use <|notimestamps|> to sample text tokens only
+    optional float max_initial_timestamp = 14; // Default: 1.0
+
+    optional bool fp16 = 15; // use fp16 for most of the calculation
+}
+
+/* text or tokens to feed as the prompt or the prefix; for more info:
+ *  https://github.com/openai/whisper/discussions/117#discussioncomment-3727051 */
+/* for the previous context */
+message Prompt {
+    optional string text = 1;
+    repeated int32 tokens = 2;
+}
+/* to prefix the current context */
+message Prefix {
+    string text = 1;
+    repeated int32 tokens = 2;
+}
+
+service WhisperServer {
+    rpc loadModel (LoadModelRequest) returns (EmptyResponse);
+    rpc setDecodingOptions (DecodingOptions) returns (EmptyResponse);
+    rpc setPrompt (Prompt) returns (EmptyResponse);
+    rpc setPrefix (Prefix) returns (EmptyResponse);
+
+    rpc waitForSpeech (EmptyRequest) returns (WhisperSimpleOutput);
+    rpc startRecognition (EmptyRequest) returns (EmptyResponse);
+    rpc stopRecognition (EmptyRequest) returns (EmptyResponse);
+}

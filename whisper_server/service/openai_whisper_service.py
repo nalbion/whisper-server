@@ -13,9 +13,9 @@ class OpenAiWhisperService(AbstractWhisperService):
     """
 
     def __init__(
-            self, mic: Microphone, model: str = 'base', english: bool = True
+            self, model: str = 'base', english: bool = True
     ):
-        super().__init__(mic, model, english)
+        super().__init__(model, english)
         self.decodeOptions = whisper.DecodingOptions(
             fp16=torch.cuda.is_available(),
             language='en' if english else None,

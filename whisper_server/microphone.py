@@ -24,12 +24,15 @@ class Microphone:
                                       rate=SAMPLE_RATE,
                                       input=True,
                                       frames_per_buffer=FRAMES_PER_BUFFER)
-        # start=True
+        self.closed = False
+
+    def __exit__(self, *err):
+        print("microphone.__exit__")
+        self.close()
 
     def __del__(self):
-        self.stream.stop_stream()
-        self.stream.close()
-        self.audio.terminate()
+        print("microphone.__del__")
+        self.close()
 
     def start(self):
         self.run = True
@@ -47,7 +50,19 @@ class Microphone:
                 yield np.frombuffer(data, np.int16).flatten().astype(np.float32) / 32768.0
                 # print("after yield, {:.3f}".format(time.time() - prev))
             else:
+                print("break from microphone.listen()")
                 break
+        print("    exit microphone.listen()")
+
     def stop(self):
+        print("  microphone.stop")
         self.run = False
         self.stream.stop_stream()
+
+    def close(self):
+        if not self.closed:
+            print("  closing microphone & terminating PyAudio")
+            self.stream.stop_stream()
+            self.audio.terminate()
+            self.closed = True
+            print("    microphone closed")

@@ -41,9 +41,9 @@ class WhisperxService(AbstractWhisperService):
     """
 
     def __init__(
-            self, mic: Microphone, model: str = 'base', english: bool = True
+            self, model: str = 'base', english: bool = True
     ):
-        super().__init__(mic, model, english)
+        super().__init__(model, english)
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         # options = faster_whisper.transcribe.TranscriptionOptions()

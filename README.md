@@ -6,6 +6,14 @@
 python -m whisper_server
 ```
 
+## Development
+
+### Generate gRPC code
+
+```bash
+python -m grpc_tools.protoc -I./docs --python_out=./whisper_server --pyi_out=./whisper_server --grpc_python_out=./whisper_server ./docs/whisper_server.proto
+```
+
 ## Whisper
 Follow the setup instructions at [Whisper on GitHub](https://github.com/openai/whisper):
 - install Python
