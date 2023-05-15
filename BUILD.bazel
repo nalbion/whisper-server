@@ -1,0 +1,25 @@
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+# Clone grpc repository for protobuf and gRPC dependencies
+git_repository(
+    name = "com_github_grpc",
+    remote = "https://github.com/grpc/grpc.git",
+    commit = "master",
+)
+
+load("@com_github_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+
+# Generate gRPC Python files
+grpc_deps()
+
+# Run code generation and fix import
+genrule(
+    name = "fix_imports",
+    srcs = [
+        "whisper_server/proto/whisper_server_pb2_grpc.py",
+    ],
+    outs = [
+        "whisper_server/proto/whisper_server_pb2_grpc.py",
+    ],
+    cmd = "sed -i \"s/import whisper_server_pb2 as whisper__server__pb2/from whisper_server.proto import whisper_server_pb2 as whisper__server__pb2/\" $<",
+)

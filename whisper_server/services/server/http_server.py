@@ -16,7 +16,7 @@ from aiohttp_sse import EventSourceResponse
 from flask import Flask, render_template
 import time
 
-from whisper_server.service.abstract_whisper_service import AbstractWhisperService
+from whisper_server.services.whisper.abstract_whisper_service import AbstractWhisperService
 
 # Flask
 # app = Flask(__name__)

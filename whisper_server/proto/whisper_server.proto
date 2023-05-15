@@ -68,11 +68,13 @@ message Prefix {
 
 service WhisperServer {
     rpc loadModel (LoadModelRequest) returns (EmptyResponse);
+
     rpc setDecodingOptions (DecodingOptions) returns (EmptyResponse);
     rpc setPrompt (Prompt) returns (EmptyResponse);
     rpc setPrefix (Prefix) returns (EmptyResponse);
 
-    rpc waitForSpeech (EmptyRequest) returns (WhisperSimpleOutput);
     rpc startRecognition (EmptyRequest) returns (EmptyResponse);
     rpc stopRecognition (EmptyRequest) returns (EmptyResponse);
+
+    rpc waitForSpeech (EmptyRequest) returns (WhisperSimpleOutput);
 }

@@ -8,7 +8,6 @@ from whisperx.audio import log_mel_spectrogram, SAMPLE_RATE, CHUNK_LENGTH, N_SAM
 from whisperx.vad import load_vad_model, merge_chunks
 
 from .abstract_whisper_service import AbstractWhisperService
-from whisper_server.microphone import Microphone
 
 default_asr_options = faster_whisper.transcribe.TranscriptionOptions(
     beam_size=5,

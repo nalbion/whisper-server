@@ -4,7 +4,7 @@ import torch
 from whisper import DecodingResult
 from whisper.audio import N_SAMPLES
 from .abstract_whisper_service import AbstractWhisperService
-from whisper_server.microphone import Microphone, FRAMES_TO_PROCESS
+from whisper_server.services.audio.microphone import FRAMES_TO_PROCESS
 
 
 class OpenAiWhisperService(AbstractWhisperService):

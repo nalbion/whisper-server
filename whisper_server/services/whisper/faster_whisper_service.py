@@ -4,13 +4,13 @@ from faster_whisper import WhisperModel, vad
 from faster_whisper.transcribe import Segment
 
 from .abstract_whisper_service import AbstractWhisperService
-from whisper_server.microphone import Microphone
 
 
 class FasterWhisperService(AbstractWhisperService):
     """
     See https://github.com/guillaumekln/faster-whisper
     """
+
     def __init__(
             self, model: str = 'base', english: bool = True
     ):
@@ -31,8 +31,7 @@ class FasterWhisperService(AbstractWhisperService):
 
         alternatives = filter(self.filter_results, segments)
         return map(lambda segment: {"text": segment.text.lstrip(), "avg_logprob": segment.avg_logprob},
-                           alternatives)
-
+                   alternatives)
 
     def filter_results(self, hypothesis: Segment):
         # Ignore no_speech_prob >= 0.75

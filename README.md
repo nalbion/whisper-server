@@ -11,7 +11,7 @@ python -m whisper_server
 ### Generate gRPC code
 
 ```bash
-python -m grpc_tools.protoc -I./docs --python_out=./whisper_server --pyi_out=./whisper_server --grpc_python_out=./whisper_server ./docs/whisper_server.proto
+python -m grpc_tools.protoc -I./whisper_server/proto --python_out=./whisper_server/proto --pyi_out=./whisper_server/proto --grpc_python_out=./whisper_server/proto ./whisper_server/proto/whisper_server.proto
 ```
 
 ## Whisper

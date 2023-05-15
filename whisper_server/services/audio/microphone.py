@@ -63,6 +63,10 @@ class Microphone:
         if not self.closed:
             print("  closing microphone & terminating PyAudio")
             self.stream.stop_stream()
+            self.stream.close()
             self.audio.terminate()
             self.closed = True
             print("    microphone closed")
+
+    def is_closed(self):
+        return self.closed
