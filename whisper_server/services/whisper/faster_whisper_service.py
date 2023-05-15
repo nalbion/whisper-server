@@ -41,6 +41,6 @@ class FasterWhisperService(AbstractWhisperService):
         #  >  -0.8 : clear speech mis-recognised or
         #  <= -0.8 : mis-pronounced
         #  <  -1.0 : is mumbled/hard to hear
-        print('avg_logprob: {:.3f}, no_speech_prob: {:.3f}'.format(hypothesis.avg_logprob, hypothesis.no_speech_prob))
+        # print('avg_logprob: {:.3f}, no_speech_prob: {:.3f}'.format(hypothesis.avg_logprob, hypothesis.no_speech_prob))
         self.logger.info('avg_logprob: %.3f, no_speech_prob: %.3f', hypothesis.avg_logprob, hypothesis.no_speech_prob)
         return hypothesis.no_speech_prob < 0.75 and hypothesis.avg_logprob > -1.0

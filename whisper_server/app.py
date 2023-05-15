@@ -67,6 +67,7 @@ async def main():
     print("================== whisper_server stopped ==================")
     # sys.exit(0)
 
+
 def log_whisper(stt_results_queue: Queue):
     while True:
         try:
@@ -81,5 +82,4 @@ def log_whisper(stt_results_queue: Queue):
 
 
 if __name__ == "__main__":
-    # freeze_support()
     asyncio.run(main())
