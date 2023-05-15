@@ -27,11 +27,9 @@ class Microphone:
                                       frames_per_buffer=FRAMES_PER_BUFFER)
 
     def __exit__(self, *err):
-        print("microphone.__exit__")
         self.close()
 
     def __del__(self):
-        print("microphone.__del__")
         self.close()
 
     def start(self):
@@ -52,21 +50,17 @@ class Microphone:
             else:
                 print("break from microphone.listen()")
                 break
-        print("    exit microphone.listen()")
 
     def stop(self):
-        print("  microphone.stop")
         self.run = False
         self.stream.stop_stream()
 
     def close(self):
         if not self.closed:
-            print("  closing microphone & terminating PyAudio")
             self.stream.stop_stream()
             self.stream.close()
             self.audio.terminate()
             self.closed = True
-            print("    microphone closed")
 
     def is_closed(self):
         return self.closed

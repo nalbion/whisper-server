@@ -9,8 +9,9 @@ from whisper_server.services.server.start_servers import start_grpc_server, star
 from whisper_server.services.whisper.start_whisper import start_whisper_process
 from whisper_server.services.utils import not_started
 
+
 async def main():
-    print("whisper_server starting...")
+    print("================ whisper_server starting... ================")
     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
     audio_active_event = Event()
@@ -37,8 +38,6 @@ async def main():
             stop_grpc_server = start_grpc_server(stt_results_queue, audio_active_event)
 
         async def stop_all():
-            print("stop_all...")
-
             await asyncio.gather(
                 stop_http_server(),
                 stop_audio(),
@@ -46,10 +45,8 @@ async def main():
                 stop_grpc_server(),
             )
 
-            print("stop_all done")
-
         signal.signal(signal.SIGINT, lambda signum, frame: asyncio.ensure_future(stop_all()))
-        print("------------------- whisper_server running -------------------")
+        print("------------------ whisper_server running ------------------")
 
         # sleep forever by 1 hour intervals,
         # on Windows before Python 3.8 wake up every 1 second to handle
@@ -62,17 +59,15 @@ async def main():
         while not interrupted_event.is_set():
             await asyncio.sleep(delay)
 
-        print("interrupted_event must be set")
         # await stop_all()
     except (KeyboardInterrupt, SystemExit):
         print("Whisper main() interrupted by keyboard")
         pass
 
-    print("DONE! end of main()")
-
+    print("================== whisper_server stopped ==================")
+    # sys.exit(0)
 
 def log_whisper(stt_results_queue: Queue):
-    print("start log_whisper...")
     while True:
         try:
             alternatives = stt_results_queue.get()
@@ -83,8 +78,6 @@ def log_whisper(stt_results_queue: Queue):
         except queue.Empty:
             print("empty stt_results queue")
             break
-
-    print("exit log_whisper")
 
 
 if __name__ == "__main__":

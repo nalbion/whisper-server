@@ -21,14 +21,11 @@ class GrpcServer(WhisperServerServicer):
         server.add_insecure_port(f'{"localhost" if localhost else "[::]"}:{port}')
         server.start()
         self.server = server
-        print("  gRPC server started")
         # server.wait_for_termination()
 
     def stop(self):
-        print("stopping gRPC server...")
         # TODO: this returns an Event, and probably won't do anything by itself
         self.server.stop(None)
-        print("gRPC server stopped")
 
     def loadModel(self, request, context):
         # request.name  language, device, download_root, in_memory
@@ -55,18 +52,18 @@ class GrpcServer(WhisperServerServicer):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
 
     def startRecognition(self, request, context):
-        print("startRecognition")
+        # print("startRecognition")
         self.audio_active_event.set()
         return empty_response
 
     def stopRecognition(self, request, context):
-        print("stopRecognition")
+        # print("stopRecognition")
         self.audio_active_event.clear()
         return empty_response
 
     def waitForSpeech(self, request, context):
-        print("waitForSpeech...")
+        # print("waitForSpeech...")
         alternatives = self.stt_results_queue.get()
-        print(f"  sending alternatives: {alternatives}")
+        # print(f"  sending alternatives: {alternatives}")
         alternatives = [alt["text"] for alt in alternatives]
         return WhisperSimpleOutput(alternatives=alternatives)

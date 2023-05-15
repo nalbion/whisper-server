@@ -1,4 +1,6 @@
 import asyncio
+import sys
+
 from .app import main
 
 async def try_main():

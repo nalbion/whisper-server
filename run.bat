@@ -1,1 +1,2 @@
-@python -m whisper_server
+@echo off
+python -m whisper_server
