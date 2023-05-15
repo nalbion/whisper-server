@@ -16,7 +16,7 @@ from whisper_server.service.openai_whisper_service import OpenAiWhisperService
 # from whisper_server.service.whisper_x_service import WhisperxService
 from whisper_server.service.faster_whisper_service import FasterWhisperService
 from whisper_server.http_server import HttpServer, use_results_queue
-from whisper_server.grpc_server import GrpcServer
+# from whisper_server.grpc_server import GrpcServer
 
 
 def start_audio_process(audio_queue: Queue):
@@ -250,7 +250,7 @@ async def main():
         stop_whisper = start_whisper_process(audio_queue, stt_results_queue, interrupted_event)
         # stop_whisper = start_whisper_thread(audio_queue, stt_results_queue)
 
-        if False:
+        if True:
             audio_active_event.set()
             log_whisper(stt_results_queue)
             stop_http_server = start_http_server_thread(stt_results_queue)

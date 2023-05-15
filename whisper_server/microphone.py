@@ -17,6 +17,7 @@ CHANNELS = 1
 
 class Microphone:
     def __init__(self):
+        self.closed = False
         self.audio = pyaudio.PyAudio()
         self.run = False
         self.stream = self.audio.open(format=FORMAT,
@@ -24,7 +25,6 @@ class Microphone:
                                       rate=SAMPLE_RATE,
                                       input=True,
                                       frames_per_buffer=FRAMES_PER_BUFFER)
-        self.closed = False
 
     def __exit__(self, *err):
         print("microphone.__exit__")
