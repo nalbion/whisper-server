@@ -1,0 +1,15 @@
+asyncio==3.4.3
+aiohttp==3.8.4
+asyncio-sse==0.1
+grpcio
+grpcio-tools
+pyaudio
+pyannote.audio
+setuptools
+ssdpy
+torch
+numpy
+# whisper~=1.1.10
+openai-whisper
+faster-whisper
+# whisperx @ git+https://github.com/m-bain/whisperx

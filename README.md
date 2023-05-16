@@ -9,6 +9,9 @@ This is intended as a local single-user server so that non-Python programs can u
 Integrates with the official [Open AI Whisper API](https://openai.com/research/whisper) and also
 [faster-whisper](https://github.com/guillaumekln/faster-whisper).
 
+## Requirements
+- Python 3.10 or greater
+- `pip install -r requirements.txt`
 
 ## Running Whisper Server
 
@@ -53,8 +56,19 @@ docker run --rm -e "PULSE_SERVER=/mnt/wslg/PulseServer" -v /mnt/wslg/:/mnt/wslg/
 
 ## Development
 
+### Adding dependencies
+
+Add any direct dependencies to `requirements.in` and run:
+
+```bash
+python -m piptools compile requirements.in --resolver=backtracking
+```
+
+
 ### Generate gRPC code
 
 ```bash
 python -m grpc_tools.protoc -I./whisper_server/proto --python_out=./whisper_server/proto --pyi_out=./whisper_server/proto --grpc_python_out=./whisper_server/proto ./whisper_server/proto/whisper_server.proto
+
+sed -i "s/import whisper_server_pb2 as whisper__server__pb2/from whisper_server.proto import whisper_server_pb2 as whisper__server__pb2/" whisper_server/proto/whisper_server_pb2_grpc.py 
 ```
