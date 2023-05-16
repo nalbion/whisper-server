@@ -11,6 +11,5 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY whisper_server ./whisper_server
-#RUN py.test tests
 
-ENTRYPOINT ["python3", "-m", "whisper_server"]
+CMD ["python", "-m", "whisper_server" ]

@@ -13,6 +13,8 @@ Integrates with the official [Open AI Whisper API](https://openai.com/research/w
 - Python 3.10 or greater
 - `pip install -r requirements.txt`
 
+or [Docker](#running-in-docker)
+
 ## Running Whisper Server
 
 ```bash
