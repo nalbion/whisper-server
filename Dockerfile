@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-RUN apt-get update && apt-get -y install python3 pip portaudio19-dev
+RUN apt-get update && apt-get -y install python3 pip python3-pyaudio
 
 WORKDIR /whisper_server
 
