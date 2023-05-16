@@ -1,15 +1,42 @@
 # Whisper Server
 
-`whisper_server` listens for speech on the microphone and streams the results in real-time over [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events) or [gRPC](https://grpc.io/).
+`whisper_server` listens for speech on the microphone and provides the results in real-time over 
+[Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events) 
+or [gRPC](https://grpc.io/).
+
+This is intended as a local single-user server so that non-Python programs can use Whisper.
 
 Integrates with the official [Open AI Whisper API](https://openai.com/research/whisper) and also
-[whisperX](https://github.com/m-bain/whisperX) and [faster-whisper](https://github.com/guillaumekln/faster-whisper).
+[faster-whisper](https://github.com/guillaumekln/faster-whisper).
 
 
 ## Running Whisper Server
 
 ```bash
 python -m whisper_server
+```
+
+### Options
+```
+  -h, --help            show this help message and exit
+  --whisper_impl {OpenAI,Faster Whisper}
+                        Which Whisper implementation to use
+  --model {tiny,base,small,medium,large}
+                        Name of the Whisper model to use (without the language suffix)
+  --language {all,en}   Specify 'en' if only English transcription is required
+  --device {cpu,gpu}    Device to use for PyTorch inference
+  --task {transcribe,translate}
+                        Whether to perform speech recognition ('transcribe') or X->English translation
+  --logging {error,warning,info,debug}
+  --ssdp, --no-ssdp     '--ssdp' to allow discoverability of host IP by SSDP (default: False)
+  --http, --no-http     '--http' to run HTTP server (default: False)
+  --http_port HTTP_PORT
+                        By default runs gRPC server on port 8080
+  --grpc, --no-grpc     '--no-grpc false' to disable gRPC server (default: True)
+  --grpc_port GRPC_PORT
+                        By default runs gRPC server on port 9090
+  --localhost, --no-localhost
+                        '--no-localhost' if you need to access the server from another computer (default: True)
 ```
 
 ### Running in Docker

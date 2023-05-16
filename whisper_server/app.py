@@ -74,7 +74,9 @@ async def main():
 
 
 def parse_args():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="whisper_server uses the system's default microphone and provides speech-to-text results over "
+                    "SSE or gRPC in real-time.")
     # Based on Whisper args: https://github.com/openai/whisper/blob/main/whisper/transcribe.py#L374
     parser.add_argument("--whisper_impl", default="OpenAI",
                         choices=["OpenAI", "Faster Whisper"],
