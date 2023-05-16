@@ -3,18 +3,18 @@ import grpc
 from whisper_server.proto.whisper_server_pb2_grpc import WhisperServerServicer, add_WhisperServerServicer_to_server
 from whisper_server.proto.whisper_server_pb2 import WhisperSimpleOutput, EmptyResponse
 from multiprocessing import Queue, Event
+from whisper_server.services.utils import logger
 
 empty_response = EmptyResponse()
 
 
 class GrpcServer(WhisperServerServicer):
-
     def __init__(self, stt_results_queue: Queue, audio_active_event: Event):
         self.stt_results_queue = stt_results_queue
         self.audio_active_event = audio_active_event
         self.server: grpc.server = None
 
-    def start(self, localhost: bool = True, port: int = 1634):
+    def start(self, localhost: bool = True, port: int = 9090):
         print(f"Starting gRPC server on port {port}")
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         add_WhisperServerServicer_to_server(self, server)
@@ -57,13 +57,14 @@ class GrpcServer(WhisperServerServicer):
         return empty_response
 
     def stopRecognition(self, request, context):
-        # print("stopRecognition")
+        logger.debug("stopRecognition")
         self.audio_active_event.clear()
         return empty_response
 
     def waitForSpeech(self, request, context):
-        # print("waitForSpeech...")
+        logger.debug("waitForSpeech...")
+
         alternatives = self.stt_results_queue.get()
-        # print(f"  sending alternatives: {alternatives}")
+        logger.debug("  sending alternatives: %s", alternatives)
         alternatives = [alt["text"] for alt in alternatives]
         return WhisperSimpleOutput(alternatives=alternatives)

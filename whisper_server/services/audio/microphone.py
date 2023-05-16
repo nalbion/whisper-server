@@ -3,6 +3,7 @@ import pyaudio
 import time
 
 from whisper.audio import SAMPLE_RATE, CHUNK_LENGTH
+from whisper_server.services.utils import logger
 
 RECORD_SECONDS = CHUNK_LENGTH  # 30
 # TODO: bring FRAMES_PER_BUFFER down and see if it breaks anything or improves latency
@@ -32,10 +33,6 @@ class Microphone:
     def __del__(self):
         self.close()
 
-    def start(self):
-        self.run = True
-        self.stream.start_stream()
-
     def listen(self):
         while self.run:
             prev = time.time()
@@ -51,7 +48,13 @@ class Microphone:
                 print("break from microphone.listen()")
                 break
 
+    def start(self):
+        self.run = True
+        self.stream.start_stream()
+        logger.debug("microphone started")
+
     def stop(self):
+        logger.debug("microphone stopped")
         self.run = False
         self.stream.stop_stream()
 

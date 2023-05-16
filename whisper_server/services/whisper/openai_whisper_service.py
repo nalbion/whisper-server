@@ -5,6 +5,7 @@ from whisper import DecodingResult
 from whisper.audio import N_SAMPLES
 from .abstract_whisper_service import AbstractWhisperService
 from whisper_server.services.audio.microphone import FRAMES_TO_PROCESS
+from whisper_server.services.utils import configure_logging, logger
 
 
 class OpenAiWhisperService(AbstractWhisperService):
@@ -13,16 +14,19 @@ class OpenAiWhisperService(AbstractWhisperService):
     """
 
     def __init__(
-            self, model: str = 'base', english: bool = True
+            self, args
     ):
-        super().__init__(model, english)
+        super().__init__(args)
         self.decodeOptions = whisper.DecodingOptions(
             fp16=torch.cuda.is_available(),
-            language='en' if english else None,
+            language=args.language,
+            task=args.task,
             sample_len=FRAMES_TO_PROCESS,
             without_timestamps=True,
             # beam_size - use BeamSearchDecoder else GreedyDecoder
         )
+        configure_logging(args.logging)
+        print(f"Open AI Whisper loading model {self.model_name}...")
         self.model = whisper.load_model(self.model_name)
 
     def speech_to_text(self, audio: np.ndarray):
@@ -59,6 +63,6 @@ class OpenAiWhisperService(AbstractWhisperService):
         #  >  -0.8 : clear speech mis-recognised or
         #  <= -0.8 : mis-pronounced
         #  <  -1.0 : is mumbled/hard to hear
-        print('avg_logprob: {:.3f}, no_speech_prob: {:.3f}'.format(hypothesis.avg_logprob, hypothesis.no_speech_prob))
-        self.logger.info('avg_logprob: %.3f, no_speech_prob: %.3f', hypothesis.avg_logprob, hypothesis.no_speech_prob)
+        # print('avg_logprob: {:.3f}, no_speech_prob: {:.3f}'.format(hypothesis.avg_logprob, hypothesis.no_speech_prob))
+        logger.debug('"%s", avg_logprob: %.3f, no_speech_prob: %.3f', hypothesis.text, hypothesis.avg_logprob, hypothesis.no_speech_prob)
         return hypothesis.no_speech_prob < 0.75 and hypothesis.avg_logprob > -1.0

@@ -1,21 +1,15 @@
 asyncio~=3.4.3
-# sse
 aiohttp~=3.8.4
-aiohttp_jinja2
-jinja2~=3.1.2
-asyncio-sse
+asyncio-sse~=0.1
 faster-whisper
-# flask_sse
-grpcio
-grpcio-tools
+grpcio~=1.54.2
+grpcio-tools~=1.54.2
 openai-whisper
 pyaudio~=0.2.13
-pyannote.audio #==0.0.1
-setuptools~=65.6.3
+pyannote.audio~=2.1.1
+setuptools==67.7.2
 ssdpy~=0.4.1
-torch~=2.0.0
-whisperx @ git+https://github.com/m-bain/whisperx
-
+torch==2.0.1
+# whisperx @ git+https://github.com/m-bain/whisperx
 numpy~=1.24.3
 whisper~=1.1.10
-Flask~=2.3.2

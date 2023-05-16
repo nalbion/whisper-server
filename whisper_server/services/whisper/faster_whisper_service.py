@@ -4,6 +4,7 @@ from faster_whisper import WhisperModel, vad
 from faster_whisper.transcribe import Segment
 
 from .abstract_whisper_service import AbstractWhisperService
+from whisper_server.services.utils import logger
 
 
 class FasterWhisperService(AbstractWhisperService):
@@ -12,22 +13,23 @@ class FasterWhisperService(AbstractWhisperService):
     """
 
     def __init__(
-            self, model: str = 'base', english: bool = True
+            self, args
     ):
-        super().__init__(model, english)
+        super().__init__(args)
         # logging.getLogger('faster_whisper').setLevel(logging.DEBUG)
+
         if torch.cuda.is_available():
-            device = 'gpu'
             compute_type = 'float16'
         else:
-            device = 'cpu'
             compute_type = 'float32'
 
-        self.model = WhisperModel(self.model_name, compute_type=compute_type, device=device)
+        print(f"Faster Whisper loading model {self.model_name}...")
+        self.model = WhisperModel(self.model_name, compute_type=compute_type, device=args.device)
+        self.task = args.task
         # self.vad = vad.get_vad_model()
 
     def speech_to_text(self, audio: np.ndarray):
-        [segments, _] = self.model.transcribe(audio, vad_filter=True)
+        [segments, _] = self.model.transcribe(audio, vad_filter=True, task=self.task)
 
         alternatives = filter(self.filter_results, segments)
         return map(lambda segment: {"text": segment.text.lstrip(), "avg_logprob": segment.avg_logprob},
@@ -42,5 +44,5 @@ class FasterWhisperService(AbstractWhisperService):
         #  <= -0.8 : mis-pronounced
         #  <  -1.0 : is mumbled/hard to hear
         # print('avg_logprob: {:.3f}, no_speech_prob: {:.3f}'.format(hypothesis.avg_logprob, hypothesis.no_speech_prob))
-        self.logger.info('avg_logprob: %.3f, no_speech_prob: %.3f', hypothesis.avg_logprob, hypothesis.no_speech_prob)
+        logger.debug('avg_logprob: %.3f, no_speech_prob: %.3f', hypothesis.avg_logprob, hypothesis.no_speech_prob)
         return hypothesis.no_speech_prob < 0.75 and hypothesis.avg_logprob > -1.0

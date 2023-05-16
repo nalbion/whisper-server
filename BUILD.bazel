@@ -1,3 +1,5 @@
+# Note: This build is untested
+
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # Clone grpc repository for protobuf and gRPC dependencies
