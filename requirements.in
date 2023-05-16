@@ -1,5 +1,6 @@
 asyncio==3.4.3
 aiohttp==3.8.4
+aiohttp_sse
 asyncio-sse==0.1
 grpcio
 grpcio-tools

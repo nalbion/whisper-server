@@ -51,6 +51,7 @@ Build the Docker image:
 docker build -t nalbion/whisper_server .
 ```
 
+In WSL or Linux:
 ```bash
 docker run --rm -e "PULSE_SERVER=/mnt/wslg/PulseServer" -v /mnt/wslg/:/mnt/wslg/ nalbion/whisper_server
 ```
