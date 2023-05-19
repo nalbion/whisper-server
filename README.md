@@ -53,12 +53,15 @@ docker build -t nalbion/whisper_server .
 
 On Linux:
 ```bash
-docker run --rm --device /dev/snd
+docker run --rm --device /dev/snd nalbion/whisper_server
 ```
 
-On Windows use WSL (PULSE_SERVER is obtained by running `echo $PULSE_SERVER`):
+On Windows use `wsl` (`PULSE_SERVER` is obtained by running `wsl echo $PULSE_SERVER`) [(credit)](https://stackoverflow.com/a/68316880/1225993):
+
+__Note: This _should_ work - it does for `Dockerfile.cpp` - if you figure it out, let me know__ 
+
 ```bash
-docker run --rm -e "PULSE_SERVER=/mnt/wslg/PulseServer" -v /mnt/wslg/:/mnt/wslg/ nalbion/whisper_server
+wsl docker run --rm -e "PULSE_SERVER=/mnt/wslg/PulseServer" -v /mnt/wslg/:/mnt/wslg/ nalbion/whisper_server
 ```
 
 

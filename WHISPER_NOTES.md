@@ -17,14 +17,14 @@ sudo apt update && sudo apt install ffmpeg
 choco install ffmpeg
 ```
 
-### whisper-server in Docker
+### Whisper in Docker
 
 ```bash
-docker build -t nalbion/whisper_server .
+docker build -t nalbion/openai-whisper .
 ```
 
 ```bash
-docker run --rm -e "PULSE_SERVER=/mnt/wslg/PulseServer" -v /mnt/wslg/:/mnt/wslg/ nalbion/whisper_server
+docker run --rm -e "PULSE_SERVER=/mnt/wslg/PulseServer" -v /mnt/wslg/:/mnt/wslg/ nalbion/openai-whisper
 ```
 
 
