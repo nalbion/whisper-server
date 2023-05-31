@@ -22,6 +22,7 @@ async def main():
     interrupted_event = Event()
     audio_queue = Queue()
     stt_results_queue = Queue()
+    command_queue = Queue()
     # commands_process = multiprocessing.Process(target=command_handler)
 
     stop_audio = not_started("audio")
@@ -30,7 +31,7 @@ async def main():
     stop_grpc_server = not_started("grpc server")
 
     try:
-        stop_audio = start_audio_thread(audio_queue, audio_active_event)
+        stop_audio = start_audio_thread(audio_queue, command_queue, audio_active_event)
         stop_whisper = start_whisper_process(args, audio_queue, stt_results_queue, interrupted_event)
         # stop_whisper = start_whisper_thread(audio_queue, stt_results_queue)
 
@@ -40,7 +41,7 @@ async def main():
             stop_http_server = start_http_server_thread(args, stt_results_queue)
 
         if args.grpc:
-            stop_grpc_server = start_grpc_server(args, stt_results_queue, audio_active_event)
+            stop_grpc_server = start_grpc_server(args, stt_results_queue, command_queue, audio_active_event)
 
         async def stop_all():
             await asyncio.gather(
@@ -79,7 +80,7 @@ def parse_args():
                     "SSE or gRPC in real-time.")
     # Based on Whisper args: https://github.com/openai/whisper/blob/main/whisper/transcribe.py#L374
     parser.add_argument("--whisper_impl", default="OpenAI",
-                        choices=["OpenAI", "Faster Whisper"],
+                        choices=["OpenAI", "FasterWhisper"],
                         help="Which Whisper implementation to use")
     parser.add_argument("--model", default="base",
                         choices=["tiny", "base", "small", "medium", "large"],

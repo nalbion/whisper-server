@@ -15,7 +15,7 @@ def signal_handler(interrupted_event):
 def run_whisper_loop(args, _audio_queue: Queue, _stt_results_queue: Queue, interrupted_event: Event):
     implementations = {
         "OpenAI": OpenAiWhisperService,
-        "Faster Whisper": FasterWhisperService,
+        "FasterWhisper": FasterWhisperService,
         # "WhisperX": WhisperxService,
     }
 
@@ -48,7 +48,6 @@ def run_whisper_loop(args, _audio_queue: Queue, _stt_results_queue: Queue, inter
             _stt_results_queue.cancel_join_thread()
             print("---------- whisper process interrupted by keyboard ---------")
             break
-
 
 
 def start_whisper_process(args, audio_queue: Queue, stt_results_queue: Queue, interrupted_event: Event):

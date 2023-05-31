@@ -1,3 +1,4 @@
+import queue
 from multiprocessing import Process, Queue, Event
 from threading import Thread
 
@@ -36,7 +37,7 @@ def start_audio_process(audio_queue: Queue, audio_active_event: Event):
     return stop
 
 
-def start_audio_thread(audio_queue: Queue, audio_active_event: Event):
+def start_audio_thread(audio_queue: Queue, command_queue: Queue, audio_active_event: Event):
     mic = Microphone()
 
     if audio_active_event.is_set():
@@ -46,7 +47,6 @@ def start_audio_thread(audio_queue: Queue, audio_active_event: Event):
         while not mic.is_closed():
             if not audio_active_event.is_set():
                 mic.stop()
-                # print("run_audio_loop waiting for startRecognition()")
                 audio_active_event.wait()
                 if mic.is_closed():
                     break
@@ -58,8 +58,22 @@ def start_audio_thread(audio_queue: Queue, audio_active_event: Event):
                 else:
                     break
 
+    def run_command_loop():
+        while not mic.is_closed():
+            try:
+                command = command_queue.get()
+                if command['type'] == 'input_device':
+                    mic.select_device(command['payload'])
+                elif command['type'] == 'exit':
+                    break
+            except queue.Empty:
+                break
+
     audio_thread = Thread(name="whisper_server audio", target=run_audio_loop)
     audio_thread.start()
+
+    command_thread = Thread(name="whisper_server audio_command", target=run_command_loop)
+    command_thread.start()
 
     async def stop():
         mic.stop()
@@ -68,5 +82,9 @@ def start_audio_thread(audio_queue: Queue, audio_active_event: Event):
         audio_queue.close()
         audio_queue.cancel_join_thread()
         audio_thread.join()
+        print("stopping command loop...")
+        command_queue.put(dict(type='exit'))
+        command_thread.join()
+        print("audio stopped")
 
     return stop

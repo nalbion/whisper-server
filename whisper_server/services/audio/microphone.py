@@ -1,6 +1,5 @@
 import numpy as np
 import pyaudio
-import time
 
 from whisper.audio import SAMPLE_RATE, CHUNK_LENGTH
 from whisper_server.services.utils import logger
@@ -21,7 +20,7 @@ class Microphone:
         self.closed = False
         self.audio = pyaudio.PyAudio()
         self.run = False
-        self.list_input_devices()
+        # self.list_input_devices()
         self.stream = self.audio.open(format=FORMAT,
                                       channels=CHANNELS,
                                       rate=SAMPLE_RATE,
@@ -35,7 +34,6 @@ class Microphone:
         self.close()
 
     def list_input_devices(self):
-
         hosts = self.audio.get_host_api_count()
         device_count = self.audio.get_device_count()
 
@@ -49,7 +47,8 @@ class Microphone:
                 inputs = device_info['maxInputChannels']
 
                 try:
-                    if 1 <= inputs <= 2 and \
+                    #if 1 <= inputs <= 2 and \
+                    if inputs >= 1 and \
                             device_info['hostApi'] == index and \
                             self.audio.is_format_supported(rate=SAMPLE_RATE,
                                                            input_device=d,
@@ -61,39 +60,38 @@ class Microphone:
                     # print(str(device_info))
                     pass
 
+    def select_device(self, name):
+        input_device_index = -1
+        device_count = self.audio.get_device_count()
+        for d in range(device_count):
+            device_info = self.audio.get_device_info_by_index(d)
+            inputs = device_info['maxInputChannels']
+            if inputs >= 1 and \
+                    self.audio.is_format_supported(rate=SAMPLE_RATE,
+                                                   input_device=d,
+                                                   input_format=FORMAT,
+                                                   input_channels=1):
+                input_device_index = d
+                break
 
+        if input_device_index != -1:
+            logger.info(f"selecting audio input device: {name}")
+            if self.run:
+                self.stop()
 
-        # for index in range(device_count):
-        #     device_info = self.audio.get_device_info_by_index(index)
-        #
-        #     try:
-        #         if device_info['maxInputChannels'] == 1 and \
-        #             device_info['hostApi'] == 0 and \
-        #             self.audio.is_format_supported(rate=SAMPLE_RATE,
-        #                                           input_device=index,
-        #                                           input_format=FORMAT,
-        #                                           input_channels=1):
-        #             print(str(device_info))
-        #             # print(f"Device {index}: {device_info['name']}")
-        #     except ValueError:
-        #         # print(str(device_info))
-        #         pass
-
-
+            self.stream = self.audio.open(format=FORMAT,
+                                          channels=CHANNELS,
+                                          rate=SAMPLE_RATE,
+                                          input=True,
+                                          frames_per_buffer=FRAMES_PER_BUFFER,
+                                          input_device_index=input_device_index)
 
     def listen(self):
         while self.run:
-            prev = time.time()
             if self.stream.is_active():
-                start = time.time()
-                # print("listening...")  # {:.3f}".format(time.time() - start))
                 data = self.stream.read(FRAMES_TO_PROCESS)
-                # print("got audio from the mic, {:.3f}".format(time.time() - start))
-                prev = time.time()
                 yield np.frombuffer(data, np.int16).flatten().astype(np.float32) / 32768.0
-                # print("after yield, {:.3f}".format(time.time() - prev))
             else:
-                print("break from microphone.listen()")
                 break
 
     def start(self):

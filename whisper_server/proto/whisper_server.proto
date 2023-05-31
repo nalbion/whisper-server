@@ -66,8 +66,13 @@ message Prefix {
     repeated int32 tokens = 2;
 }
 
+message AudioInputDeviceSelection {
+    string deviceName = 1;
+}
+
 service WhisperServer {
     rpc loadModel (LoadModelRequest) returns (EmptyResponse);
+    rpc selectAudioInputDevice (AudioInputDeviceSelection) returns (EmptyResponse);
 
     rpc setDecodingOptions (DecodingOptions) returns (EmptyResponse);
     rpc setPrompt (Prompt) returns (EmptyResponse);

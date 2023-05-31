@@ -8,6 +8,12 @@ DESCRIPTOR: _descriptor.FileDescriptor
 cpu: ProcessingDevice
 gpu: ProcessingDevice
 
+class AudioInputDeviceSelection(_message.Message):
+    __slots__ = ["deviceName"]
+    DEVICENAME_FIELD_NUMBER: _ClassVar[int]
+    deviceName: str
+    def __init__(self, deviceName: _Optional[str] = ...) -> None: ...
+
 class DecodingOptions(_message.Message):
     __slots__ = ["beam_size", "best_of", "fp16", "language", "length_penalty", "max_initial_timestamp", "patience", "prefix", "prompt", "sample_len", "suppress_blank", "suppress_tokens", "task", "temperature", "without_timestamps"]
     BEAM_SIZE_FIELD_NUMBER: _ClassVar[int]

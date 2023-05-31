@@ -19,6 +19,11 @@ class WhisperServerStub(object):
                 request_serializer=whisper__server__pb2.LoadModelRequest.SerializeToString,
                 response_deserializer=whisper__server__pb2.EmptyResponse.FromString,
                 )
+        self.selectAudioInputDevice = channel.unary_unary(
+                '/org.openasr.WhisperServer/selectAudioInputDevice',
+                request_serializer=whisper__server__pb2.AudioInputDeviceSelection.SerializeToString,
+                response_deserializer=whisper__server__pb2.EmptyResponse.FromString,
+                )
         self.setDecodingOptions = channel.unary_unary(
                 '/org.openasr.WhisperServer/setDecodingOptions',
                 request_serializer=whisper__server__pb2.DecodingOptions.SerializeToString,
@@ -34,11 +39,6 @@ class WhisperServerStub(object):
                 request_serializer=whisper__server__pb2.Prefix.SerializeToString,
                 response_deserializer=whisper__server__pb2.EmptyResponse.FromString,
                 )
-        self.waitForSpeech = channel.unary_unary(
-                '/org.openasr.WhisperServer/waitForSpeech',
-                request_serializer=whisper__server__pb2.EmptyRequest.SerializeToString,
-                response_deserializer=whisper__server__pb2.WhisperSimpleOutput.FromString,
-                )
         self.startRecognition = channel.unary_unary(
                 '/org.openasr.WhisperServer/startRecognition',
                 request_serializer=whisper__server__pb2.EmptyRequest.SerializeToString,
@@ -49,12 +49,23 @@ class WhisperServerStub(object):
                 request_serializer=whisper__server__pb2.EmptyRequest.SerializeToString,
                 response_deserializer=whisper__server__pb2.EmptyResponse.FromString,
                 )
+        self.waitForSpeech = channel.unary_unary(
+                '/org.openasr.WhisperServer/waitForSpeech',
+                request_serializer=whisper__server__pb2.EmptyRequest.SerializeToString,
+                response_deserializer=whisper__server__pb2.WhisperSimpleOutput.FromString,
+                )
 
 
 class WhisperServerServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def loadModel(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def selectAudioInputDevice(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -78,12 +89,6 @@ class WhisperServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def waitForSpeech(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def startRecognition(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -96,12 +101,23 @@ class WhisperServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def waitForSpeech(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_WhisperServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'loadModel': grpc.unary_unary_rpc_method_handler(
                     servicer.loadModel,
                     request_deserializer=whisper__server__pb2.LoadModelRequest.FromString,
+                    response_serializer=whisper__server__pb2.EmptyResponse.SerializeToString,
+            ),
+            'selectAudioInputDevice': grpc.unary_unary_rpc_method_handler(
+                    servicer.selectAudioInputDevice,
+                    request_deserializer=whisper__server__pb2.AudioInputDeviceSelection.FromString,
                     response_serializer=whisper__server__pb2.EmptyResponse.SerializeToString,
             ),
             'setDecodingOptions': grpc.unary_unary_rpc_method_handler(
@@ -119,11 +135,6 @@ def add_WhisperServerServicer_to_server(servicer, server):
                     request_deserializer=whisper__server__pb2.Prefix.FromString,
                     response_serializer=whisper__server__pb2.EmptyResponse.SerializeToString,
             ),
-            'waitForSpeech': grpc.unary_unary_rpc_method_handler(
-                    servicer.waitForSpeech,
-                    request_deserializer=whisper__server__pb2.EmptyRequest.FromString,
-                    response_serializer=whisper__server__pb2.WhisperSimpleOutput.SerializeToString,
-            ),
             'startRecognition': grpc.unary_unary_rpc_method_handler(
                     servicer.startRecognition,
                     request_deserializer=whisper__server__pb2.EmptyRequest.FromString,
@@ -133,6 +144,11 @@ def add_WhisperServerServicer_to_server(servicer, server):
                     servicer.stopRecognition,
                     request_deserializer=whisper__server__pb2.EmptyRequest.FromString,
                     response_serializer=whisper__server__pb2.EmptyResponse.SerializeToString,
+            ),
+            'waitForSpeech': grpc.unary_unary_rpc_method_handler(
+                    servicer.waitForSpeech,
+                    request_deserializer=whisper__server__pb2.EmptyRequest.FromString,
+                    response_serializer=whisper__server__pb2.WhisperSimpleOutput.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -157,6 +173,23 @@ class WhisperServer(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/org.openasr.WhisperServer/loadModel',
             whisper__server__pb2.LoadModelRequest.SerializeToString,
+            whisper__server__pb2.EmptyResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def selectAudioInputDevice(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/org.openasr.WhisperServer/selectAudioInputDevice',
+            whisper__server__pb2.AudioInputDeviceSelection.SerializeToString,
             whisper__server__pb2.EmptyResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -213,23 +246,6 @@ class WhisperServer(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def waitForSpeech(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/org.openasr.WhisperServer/waitForSpeech',
-            whisper__server__pb2.EmptyRequest.SerializeToString,
-            whisper__server__pb2.WhisperSimpleOutput.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def startRecognition(request,
             target,
             options=(),
@@ -260,5 +276,22 @@ class WhisperServer(object):
         return grpc.experimental.unary_unary(request, target, '/org.openasr.WhisperServer/stopRecognition',
             whisper__server__pb2.EmptyRequest.SerializeToString,
             whisper__server__pb2.EmptyResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def waitForSpeech(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/org.openasr.WhisperServer/waitForSpeech',
+            whisper__server__pb2.EmptyRequest.SerializeToString,
+            whisper__server__pb2.WhisperSimpleOutput.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

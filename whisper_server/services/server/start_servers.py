@@ -31,14 +31,15 @@ def start_http_server_thread(args, stt_results_queue: Queue):
     return stop
 
 
-def start_grpc_server(args, stt_results_queue: Queue, audio_active_event: Event):
+def start_grpc_server(args, stt_results_queue: Queue, command_queue: Queue, audio_active_event: Event):
     """
     :param args: `localhost` and `grpc_port` as configured by the CLI args.
     :param stt_results_queue: The gRPC server receives speech-to-text events on this queue
+    :param command_queue: Used to receive commands via gRPC and dispatch to other components of this server
     :param audio_active_event: The gRPC API can stop/start the audio input stream
     :return:
     """
-    server = GrpcServer(stt_results_queue, audio_active_event)
+    server = GrpcServer(stt_results_queue, command_queue, audio_active_event)
     server.start(args.localhost, args.grpc_port)
 
     async def stop():

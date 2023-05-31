@@ -1,6 +1,7 @@
 @echo off
 REM gRPC Server
-python -m whisper_server --model base --language en --grpc_port 1634 --logging info
+@REM python -m whisper_server --model base --language en --grpc_port 1634 --logging info
+python -m whisper_server --whisper_impl FasterWhisper --model base --language en --grpc_port 1634 --logging info
 
 REM on Docker
 REM wsl docker run --rm -e "PULSE_SERVER=/mnt/wslg/PulseServer" -v /mnt/wslg/:/mnt/wslg/ nalbion/whisper_server

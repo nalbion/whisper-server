@@ -1,7 +1,7 @@
 from concurrent import futures
 import grpc
 from whisper_server.proto.whisper_server_pb2_grpc import WhisperServerServicer, add_WhisperServerServicer_to_server
-from whisper_server.proto.whisper_server_pb2 import WhisperSimpleOutput, EmptyResponse
+from whisper_server.proto.whisper_server_pb2 import WhisperSimpleOutput, EmptyResponse, AudioInputDeviceSelection
 from multiprocessing import Queue, Event
 from whisper_server.services.utils import logger
 
@@ -9,8 +9,9 @@ empty_response = EmptyResponse()
 
 
 class GrpcServer(WhisperServerServicer):
-    def __init__(self, stt_results_queue: Queue, audio_active_event: Event):
+    def __init__(self, stt_results_queue: Queue, command_queue: Queue, audio_active_event: Event):
         self.stt_results_queue = stt_results_queue
+        self.command_queue = command_queue
         self.audio_active_event = audio_active_event
         self.server: grpc.server = None
 
@@ -26,6 +27,8 @@ class GrpcServer(WhisperServerServicer):
     def stop(self):
         # TODO: this returns an Event, and probably won't do anything by itself
         self.server.stop(None)
+        self.command_queue.close()
+        self.command_queue.cancel_join_thread()
 
     def loadModel(self, request, context):
         # request.name  language, device, download_root, in_memory
@@ -34,6 +37,10 @@ class GrpcServer(WhisperServerServicer):
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
 
     # TODO: gain adjustable from client
+
+    def selectAudioInputDevice(self, request: AudioInputDeviceSelection, context):
+        self.command_queue.put(dict(type="input_device", payload=request.deviceName))
+        return empty_response
 
     def setPrefix(self, request, context):
         """
@@ -62,8 +69,6 @@ class GrpcServer(WhisperServerServicer):
         return empty_response
 
     def waitForSpeech(self, request, context):
-        logger.debug("waitForSpeech...")
-
         alternatives = self.stt_results_queue.get()
         logger.debug("  sending alternatives: %s", alternatives)
         alternatives = [alt["text"] for alt in alternatives]
