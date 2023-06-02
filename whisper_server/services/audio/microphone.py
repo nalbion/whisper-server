@@ -3,16 +3,21 @@ import pyaudio
 
 from whisper.audio import SAMPLE_RATE, CHUNK_LENGTH
 from whisper_server.services.utils import logger
+from faster_whisper.vad import get_speech_timestamps, collect_chunks
 
 RECORD_SECONDS = CHUNK_LENGTH  # 30
 # TODO: bring FRAMES_PER_BUFFER down and see if it breaks anything or improves latency
 # FRAMES_PER_BUFFER = 1024
 # FRAMES_PER_BUFFER = 3000
 # OpenAI Whisper complains if not 480000: assert x.shape[1:] == self.positional_embedding.shape, "incorrect audio shape"
-FRAMES_PER_BUFFER = RECORD_SECONDS * SAMPLE_RATE  # 480,000 = N_SAMPLES
+FRAMES_PER_BUFFER = RECORD_SECONDS * SAMPLE_RATE  # 480,000 = N_SAMPLES (16kHz for 30 seconds)
 FRAMES_TO_PROCESS = FRAMES_PER_BUFFER >> 3
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
+
+min_speech_ms = 100
+max_speech_ms = 0
+max_silence_ms = 1000
 
 
 class Microphone:
@@ -87,10 +92,35 @@ class Microphone:
                                           input_device_index=input_device_index)
 
     def listen(self):
+        vad_parameters = dict(
+            # threshold=0.5,
+            min_speech_duration_ms=min_speech_ms,
+            # max_speech_duration_ms=float("inf") if max_speech_ms == 0,
+            min_silence_duration_ms=max_silence_ms
+            # window_size_samples=1024
+            # speech_pad_ms=400
+        )
+
+        speech = np.array([], dtype=np.float32)
+
         while self.run:
             if self.stream.is_active():
                 data = self.stream.read(FRAMES_TO_PROCESS)
-                yield np.frombuffer(data, np.int16).flatten().astype(np.float32) / 32768.0
+
+                # TODO: compare faster_whisper.vad vs the idiolect VAD
+                audio = np.frombuffer(data, np.int16).flatten().astype(np.float32) / 32768.0
+                chunks = get_speech_timestamps(audio, **vad_parameters)
+
+                if len(chunks) != 0:
+                    collected = collect_chunks(audio, chunks)
+                    speech = np.concatenate((speech, collected))
+
+                    if chunks[-1]['end'] == len(audio):
+                        continue
+
+                if len(speech) != 0:
+                    yield speech
+                    speech = np.array([], dtype=np.float32)
             else:
                 break
 

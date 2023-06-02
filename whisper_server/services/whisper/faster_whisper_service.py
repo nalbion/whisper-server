@@ -29,7 +29,12 @@ class FasterWhisperService(AbstractWhisperService):
         # self.vad = vad.get_vad_model()
 
     def speech_to_text(self, audio: np.ndarray):
-        [segments, _] = self.model.transcribe(audio, vad_filter=True, task=self.task)
+        print(f"transcribing {len(audio)}")
+        [segments, _] = self.model.transcribe(audio,
+                                              task=self.task,
+                                              # vad_filter=True,
+                                              # vad_parameters=dict()
+                                              )
 
         alternatives = filter(self.filter_results, segments)
         return map(lambda segment: {"text": segment.text.lstrip(), "avg_logprob": segment.avg_logprob},
